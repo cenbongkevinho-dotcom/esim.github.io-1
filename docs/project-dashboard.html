@@ -1,0 +1,74 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>项目总览仪表盘（A）</title><style>
+  body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,sans-serif;margin:0;padding:0;background:#f7f7f7;color:#222}
+  header{background:#222;color:#fff;padding:12px 16px}
+  h1{font-size:18px;margin:0}
+  .sec{background:#fff;margin:12px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+  .sec h2{font-size:16px;margin:0;padding:12px 16px;border-bottom:1px solid #eee}
+  .sec .content{padding:10px 16px}
+  .list{list-style:none;margin:0;padding:0}
+  .list li{padding:8px 0;border-bottom:1px solid #eee}
+  .bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin:6px 0}
+  .fill{height:100%;background:#3b82f6}
+  .pct{font-size:12px;color:#555;margin-left:8px}
+  a{color:#0ea5e9;text-decoration:none}
+  .chip{display:inline-block;background:#eef;border:1px solid #cce;border-radius:9999px;padding:2px 8px;margin-right:6px;font-size:12px;color:#334}
+</style></head><body><header><h1>项目总览仪表盘（A）</h1><div style="font-size:12px;margin-top:6px">最后更新：2025-10-18T02:17:13.685Z</div></header><section class="sec"><h2>阶段性进度（Milestones）</h2><div class="content"><div>暂无 Milestones（可在 GitHub 仓库的 Milestones 中创建并分配 Issue 以自动统计进度）。</div></div></section><section class="sec"><h2>各 Agent 任务进度</h2><div class="content"><div style="margin-bottom:10px"><div class="chip">Backend</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div><div style="margin-bottom:10px"><div class="chip">Frontend</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div><div style="margin-bottom:10px"><div class="chip">CI/CD</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div><div style="margin-bottom:10px"><div class="chip">Data</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div><div style="margin-bottom:10px"><div class="chip">eSIM</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div><div style="margin-bottom:10px"><div class="chip">DocOps</div><div style="font-size:12px;color:#666">Issues: 0，PRs: 0</div></div></div></section><section class="sec"><h2>后台执行（CI）进度与完成情况</h2><div class="content"><ul class="list"><li>contract-regression.yml -> in_progress <a href="https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18609287760" target="_blank">查看</a></li><li>pr-build-outputs-guard.yml -> none </li><li>i18n-locales-consistency.yml -> success <a href="https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18591391008" target="_blank">查看</a></li><li>ci-monitoring.yml -> skipped <a href="https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18609281271" target="_blank">查看</a></li></ul></div></section><section class="sec"><h2>需我确认的任务清单</h2><div class="content"><div id="login-gate" style="margin:8px 0 12px 0"><div style="font-size:12px;color:#666">登录后可进行“确认”操作。</div></div><div id="needs-confirm-list"><div>暂无需确认的条目。请为需要你的确认的 Issue/PR 添加标签 “Needs: Confirm”。</div></div></div></section><script>(function(){
+  const CONFIG = {
+    API_BASE: localStorage.getItem('confirm_api_base') || 'http://localhost:8003',
+    USERNAME: 'admin'
+  };
+  const state = { loggedIn:false, authHeader:'' };
+  function setApiBase(){
+     const v = prompt('请输入确认 API 地址（如 https://confirm.example.com）', CONFIG.API_BASE||'');
+     if(v){
+        CONFIG.API_BASE = v.trim();
+        localStorage.setItem('confirm_api_base', CONFIG.API_BASE);
+        renderLoginGate();
+     }
+  }
+  function enableConfirmButtons(on){
+     document.querySelectorAll('[data-confirm-btn]').forEach(btn=>{
+        if(on){ btn.removeAttribute('disabled'); btn.classList.remove('disabled'); }
+        else { btn.setAttribute('disabled','disabled'); btn.classList.add('disabled'); }
+     });
+  }
+  async function loginConfirm(){
+     const pwdInput = document.getElementById('confirm-pwd');
+     if(!pwdInput) return;
+     const pwd = pwdInput.value.trim();
+     if(!CONFIG.API_BASE){ alert('尚未配置确认 API 地址'); return; }
+     const auth = 'Basic ' + btoa(CONFIG.USERNAME + ':' + pwd);
+     try {
+        const r = await fetch(CONFIG.API_BASE + '/auth/check', { headers: { 'Authorization': auth } });
+        if(r.ok){ state.loggedIn=true; state.authHeader=auth; const st=document.getElementById('login-status'); if(st) st.textContent='已登录'; enableConfirmButtons(true); }
+        else alert('密码错误');
+     } catch(e){ alert('无法连接确认 API：' + e); }
+  }
+  async function confirmItem(type, number, repoFull){
+     if(!state.loggedIn){ alert('请先登录'); return; }
+     if(!CONFIG.API_BASE){ alert('尚未配置确认 API 地址'); return; }
+     const payload = { type, number, repo: repoFull, actions: { removeLabel:'Needs: Confirm', addLabel: 'Confirmed', comment: '已由负责人确认' } };
+     try {
+        const r = await fetch(CONFIG.API_BASE + '/confirm', { method:'POST', headers: { 'Authorization': state.authHeader, 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        const body = await r.json().catch(()=>({}));
+        if(r.ok){ alert('确认已提交：' + (body.message||'成功')); }
+        else alert('确认失败：' + (body.error||r.status));
+     } catch(e){ alert('网络错误：' + e); }
+  }
+  function renderLoginGate(){
+     const gate = document.getElementById('login-gate');
+     if(!gate) return;
+     gate.innerHTML = '<div style="padding:8px;border:1px solid #ddd;border-radius:8px;background:#fafafa;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+       '<div style="font-weight:600">确认操作登录</div>' +
+       '<input id="confirm-pwd" type="password" placeholder="输入密码" style="flex:1;min-width:160px;padding:6px 8px;border:1px solid #ccc;border-radius:6px" />' +
+       '<button onclick="window._loginConfirm()" class="btn">登录</button>' +
+       '<button onclick="window._setApiBase()" class="btn" style="background:#555;color:#fff;border:0;padding:6px 10px;border-radius:6px">设置 API 地址</button>' +
+       '<div id="login-status" style="font-size:12px;color:#666">未登录</div>' +
+      '</div>';
+     enableConfirmButtons(false);
+  }
+  window._setApiBase = setApiBase;
+  window._loginConfirm = loginConfirm;
+  window.confirmItem = confirmItem;
+  document.addEventListener('DOMContentLoaded', renderLoginGate);
+})();</script></body></html>
