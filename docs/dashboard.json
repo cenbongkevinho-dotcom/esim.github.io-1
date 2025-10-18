@@ -1,0 +1,72 @@
+{
+  "updatedAt": "2025-10-18T02:17:13.685Z",
+  "milestones": [],
+  "agents": [
+    {
+      "name": "Backend",
+      "label": "Agent: Backend",
+      "issues": [],
+      "prs": []
+    },
+    {
+      "name": "Frontend",
+      "label": "Agent: Frontend",
+      "issues": [],
+      "prs": []
+    },
+    {
+      "name": "CI/CD",
+      "label": "Agent: CI/CD",
+      "issues": [],
+      "prs": []
+    },
+    {
+      "name": "Data",
+      "label": "Agent: Data",
+      "issues": [],
+      "prs": []
+    },
+    {
+      "name": "eSIM",
+      "label": "Agent: eSIM",
+      "issues": [],
+      "prs": []
+    },
+    {
+      "name": "DocOps",
+      "label": "Agent: DocOps",
+      "issues": [],
+      "prs": []
+    }
+  ],
+  "workflows": [
+    {
+      "name": "contract-regression.yml",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18609287760"
+    },
+    {
+      "name": "pr-build-outputs-guard.yml",
+      "status": "none",
+      "conclusion": null,
+      "url": null
+    },
+    {
+      "name": "i18n-locales-consistency.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18591391008"
+    },
+    {
+      "name": "ci-monitoring.yml",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/cenbongkevinho-dotcom/Develop/actions/runs/18609281271"
+    }
+  ],
+  "needsConfirm": {
+    "issues": [],
+    "prs": []
+  }
+}
